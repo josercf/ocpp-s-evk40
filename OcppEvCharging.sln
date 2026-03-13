@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E9F6E390-F0E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcppEvCharging.Server", "src\OcppEvCharging.Server\OcppEvCharging.Server.csproj", "{FB1A669F-8F33-4774-AE90-F51182E5538B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BB276944-7DB9-46E3-8A7C-B410C74BB393}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcppEvCharging.Tests", "tests\OcppEvCharging.Tests\OcppEvCharging.Tests.csproj", "{08E6CB91-3D5C-4246-8B2B-7311C98E1D99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{FB1A669F-8F33-4774-AE90-F51182E5538B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB1A669F-8F33-4774-AE90-F51182E5538B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB1A669F-8F33-4774-AE90-F51182E5538B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E6CB91-3D5C-4246-8B2B-7311C98E1D99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E6CB91-3D5C-4246-8B2B-7311C98E1D99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E6CB91-3D5C-4246-8B2B-7311C98E1D99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E6CB91-3D5C-4246-8B2B-7311C98E1D99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FB1A669F-8F33-4774-AE90-F51182E5538B} = {E9F6E390-F0ED-43ED-9D87-8030611EA866}
+		{08E6CB91-3D5C-4246-8B2B-7311C98E1D99} = {BB276944-7DB9-46E3-8A7C-B410C74BB393}
 	EndGlobalSection
 EndGlobal
