@@ -1,0 +1,55 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: ocpp-timescaledb
+    environment:
+      POSTGRES_DB: ocpp
+      POSTGRES_USER: ocpp
+      POSTGRES_PASSWORD: ocpp_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+      - ./timescaledb/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ocpp -d ocpp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ocpp-server:
+    build:
+      context: ../src/OcppEvCharging.Server
+      dockerfile: Dockerfile
+    container_name: ocpp-server
+    ports:
+      - "6580:6580"
+    environment:
+      ConnectionStrings__TimescaleDb: "Host=timescaledb;Port=5432;Database=ocpp;Username=ocpp;Password=ocpp_password"
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ocpp-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/ev-charging.json
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  timescaledb_data:
+  grafana_data:

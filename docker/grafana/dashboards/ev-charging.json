@@ -1,0 +1,342 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_TIMESCALEDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Power (kW)",
+            "fillOpacity": 20,
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": false
+          },
+          "unit": "kwatt"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_TIMESCALEDB}" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_bucket('1 minute', time) AS time,\n  charge_point_id,\n  avg(value) / 1000 AS power_kw\nFROM meter_values\nWHERE\n  measurand = 'Power.Active.Import'\n  AND $__timeFilter(time)\nGROUP BY 1, 2\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Power Over Time (kW)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_TIMESCALEDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": false
+          },
+          "unit": "volt"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byRegexp", "options": ".*Current.*" },
+            "properties": [
+              { "id": "custom.axisPlacement", "value": "right" },
+              { "id": "unit", "value": "amp" }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_TIMESCALEDB}" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_bucket('1 minute', time) AS time,\n  'Voltage' AS metric,\n  avg(value) AS value\nFROM meter_values\nWHERE\n  measurand = 'Voltage'\n  AND $__timeFilter(time)\nGROUP BY 1\nORDER BY 1",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_TIMESCALEDB}" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_bucket('1 minute', time) AS time,\n  'Current' AS metric,\n  avg(value) AS value\nFROM meter_values\nWHERE\n  measurand = 'Current.Import'\n  AND $__timeFilter(time)\nGROUP BY 1\nORDER BY 1",
+          "refId": "B"
+        }
+      ],
+      "title": "Voltage & Current",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_TIMESCALEDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "continuous-GrYlRd" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Temperature",
+            "fillOpacity": 20,
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": false,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 60 }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_TIMESCALEDB}" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_bucket('1 minute', time) AS time,\n  charge_point_id,\n  avg(value) AS temperature\nFROM meter_values\nWHERE\n  measurand = 'Temperature'\n  AND $__timeFilter(time)\nGROUP BY 1, 2\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Temperature Monitoring",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_TIMESCALEDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Energy (kWh)",
+            "fillOpacity": 80,
+            "lineWidth": 1
+          },
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 4,
+      "options": {
+        "barRadius": 0.1,
+        "barWidth": 0.8,
+        "groupWidth": 0.7,
+        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "bottom" },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": { "mode": "single", "sort": "none" },
+        "xTickLabelRotation": -45
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_TIMESCALEDB}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  transaction_id::text AS \"Transaction\",\n  charge_point_id,\n  energy_kwh AS \"Energy (kWh)\",\n  start_time\nFROM charging_sessions\nWHERE\n  energy_kwh IS NOT NULL\n  AND $__timeFilter(start_time)\nORDER BY start_time DESC\nLIMIT 20",
+          "refId": "A"
+        }
+      ],
+      "title": "Energy per Charging Session",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_TIMESCALEDB}"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "energy_kwh" },
+            "properties": [{ "id": "unit", "value": "kwatth" }, { "id": "decimals", "value": 2 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "duration" },
+            "properties": [{ "id": "unit", "value": "dtdurationms" }]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 16 },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "start_time" }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_TIMESCALEDB}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  transaction_id,\n  charge_point_id,\n  connector_id,\n  id_tag,\n  start_time,\n  stop_time,\n  EXTRACT(EPOCH FROM (stop_time - start_time)) * 1000 AS duration,\n  meter_start,\n  meter_stop,\n  energy_kwh,\n  stop_reason\nFROM charging_sessions\nWHERE $__timeFilter(start_time)\nORDER BY start_time DESC\nLIMIT 50",
+          "refId": "A"
+        }
+      ],
+      "title": "Charging Session History",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_TIMESCALEDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "Available": { "color": "green", "index": 0, "text": "Available" } }, "type": "value" },
+            { "options": { "Charging": { "color": "blue", "index": 1, "text": "Charging" } }, "type": "value" },
+            { "options": { "Preparing": { "color": "yellow", "index": 2, "text": "Preparing" } }, "type": "value" },
+            { "options": { "Finishing": { "color": "orange", "index": 3, "text": "Finishing" } }, "type": "value" },
+            { "options": { "Faulted": { "color": "red", "index": 4, "text": "Faulted" } }, "type": "value" },
+            { "options": { "Unavailable": { "color": "dark-gray", "index": 5, "text": "Unavailable" } }, "type": "value" }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "/^status$/",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "${DS_TIMESCALEDB}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  charge_point_id || ' / Connector ' || connector_id AS \"name\",\n  status,\n  updated_at\nFROM connector_status\nORDER BY charge_point_id, connector_id",
+          "refId": "A"
+        }
+      ],
+      "title": "Charger Status",
+      "type": "stat"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["ev-charging", "ocpp"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "${DS_TIMESCALEDB}"
+        },
+        "definition": "SELECT DISTINCT charge_point_id FROM charge_points",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "charge_point",
+        "options": [],
+        "query": "SELECT DISTINCT charge_point_id FROM charge_points",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "EV Charging Monitor",
+  "uid": "ev-charging-dashboard",
+  "version": 1
+}
